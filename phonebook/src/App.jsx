@@ -10,6 +10,8 @@ function App() {
   const [searchFilter, setSearchFilter] = useState("");
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
+  const [filteredPersons, setFilteredPersons] = useState([]);
+
 
   function firstRun() {
     axios.get("http://localhost:3001/persons").then((res) => {
@@ -17,6 +19,7 @@ function App() {
       setPersons(prev => data);
     })
   }
+
   function updateChange(event) {
     const value = event.target.value;
     if(event.target.id === "input_search") {
@@ -30,16 +33,35 @@ function App() {
     }
   }
 
+  function filterPersons() {
+    if(searchFilter === "") {
+      return(persons)
+    }
+    else {
+      const filteredPersons = persons.filter((person) => {
+        return (
+          person.name.toLowerCase().includes(searchFilter.toLowerCase())
+        )
+      })
+      return filteredPersons;
+
+    }
+   
+  }
+  function updateFiltered() {
+  setFilteredPersons(prev => [...filterPersons()])
+  }
+  
+
   useEffect(firstRun, []);
+  useEffect(updateFiltered,[persons]);
+  useEffect(updateFiltered, [searchFilter])
   return (
     <>
       <Header text="search"/>
       <Input  id={"input_search"} onChange={updateChange} labelText={"Search"} />
       <Form onChange={updateChange}/>
-      <PersonList persons={persons} />
-      {console.log("rendered SearchFilter: ", searchFilter)}
-      {console.log("rendered name: ", name)}
-      {console.log("rendered number: ", number)}
+      <PersonList persons={filteredPersons} />
     </>
     
   )
