@@ -1,7 +1,7 @@
 import React from 'react';
 import services from '../services/phonebook'
 
-function Person({person, removePerson}) {
+function Person({person, removePerson, updateMessage}) {
 
     async function deletePerson() {
         const confirmed = confirm(`Are you sure you want to delete ${person.name}?`)
@@ -9,15 +9,20 @@ function Person({person, removePerson}) {
             try {
                 const response = await services.deleteFromDatabase(person.id);
                 removePerson(response.data.id);
+                updateMessage (
+                    `${person.name} was successfully removed from database`,
+                    "success"
+                )
             }
-            catch {(error) => {
-                console.log(error);
-                }
+            catch (error) {
+                console.error(error)
+                removePerson(person.id);
+                updateMessage(
+                    `${person.name} was previously deleted from database`
+                )
             }
         }
-       
-
-    }
+        }
 
 
     return (

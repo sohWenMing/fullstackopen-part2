@@ -4,7 +4,7 @@ import Input from './Input';
 import services from '../services/phonebook'
 
 
-function Form({onChange, persons, addPerson, updatePerson}) {
+function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
     
 
     const [nameValid, setNameValid] = useState(true);
@@ -36,6 +36,10 @@ function Form({onChange, persons, addPerson, updatePerson}) {
             .then((res) => {
                 const personObject = res.data;
                 addPerson(personObject);
+                updateMessage(
+                    `${res.data.name}'s information successfully added!`,
+                    "success"
+                )
             })     
         }
         if(number === "") {
@@ -65,14 +69,26 @@ function Form({onChange, persons, addPerson, updatePerson}) {
                     number: number
                 }
                 console.log("new person object: ", updatedPerson);
+                const personsWithUpdatedRemoved = persons.filter(person => person.id !== updatedPerson.id)
 
-                
                 services.update(updatedPerson)
                 .then((res) => {
                     const returnedPerson = res.data;
-                    const personsWithUpdatedRemoved = persons.filter(person => person.id !== returnedPerson.id);
                     const updatedList = [...personsWithUpdatedRemoved, returnedPerson];
                     updatePerson(updatedList);
+                    updateMessage(
+                        `${res.data.name}'s information successfully updated!`,
+                        "success"
+                    )
+                })
+                .catch((error) => {
+                    const updatedList = [...personsWithUpdatedRemoved];
+                    updatePerson(updatedList);
+                    updateMessage(
+                        `${updatedPerson.name} was already removed from database`,
+                        "fail"
+                    )
+                    
                     
                 })
             }

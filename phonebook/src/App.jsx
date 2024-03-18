@@ -12,10 +12,16 @@ function App() {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [filteredPersons, setFilteredPersons] = useState([]);
-  const [showMessage, setShowMessage] = useState(true);
   
+  const [messageType, setMessageType] = useState("");
+  const [message, setMessage] = useState("")
 
-
+  function updateMessage(message, messageType) {
+    setMessage(prev => message)
+    setMessageType(prev => messageType);
+  }
+  
+  
   function firstRun() {
     services.getAll().then((res) => {
       const data = res.data;
@@ -90,14 +96,21 @@ function App() {
   useEffect(firstRun, []);
   useEffect(updateFiltered,[persons]);
   useEffect(updateFiltered, [searchFilter])
+  useEffect(() => {
+    if(messageType !== "") {
+      setTimeout(() => {
+        setMessageType(prev => "")
+      }, 5000)
+    }
+
+  }, [messageType])
   return (
     <>
       <Header text="search"/>
-      <Message />
-
+      {messageType !="" && <Message message={message} messageType={messageType}/>}
       <Input  id={"input_search"} onChange={updateChange} labelText={"Search"} />
-      <Form onChange={updateChange} persons={persons} addPerson={addPerson} updatePerson={updatePerson}/> 
-      <PersonList persons={filteredPersons} removePerson={removePerson} />
+      <Form onChange={updateChange} persons={persons} addPerson={addPerson} updatePerson={updatePerson} updateMessage={updateMessage}/> 
+      <PersonList persons={filteredPersons} removePerson={removePerson} updateMessage={updateMessage}/>
     </>
     
   )
