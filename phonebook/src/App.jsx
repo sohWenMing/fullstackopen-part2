@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Input from './components/Input'
 import Form from './components/Form'
 import services from './services/phonebook'
+import Message from './components/Message'
 
 function App() {
   const [persons, setPersons] = useState([]);
@@ -11,6 +12,7 @@ function App() {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [filteredPersons, setFilteredPersons] = useState([]);
+  const [showMessage, setShowMessage] = useState(true);
   
 
 
@@ -91,6 +93,8 @@ function App() {
   return (
     <>
       <Header text="search"/>
+      <Message />
+
       <Input  id={"input_search"} onChange={updateChange} labelText={"Search"} />
       <Form onChange={updateChange} persons={persons} addPerson={addPerson} updatePerson={updatePerson}/> 
       <PersonList persons={filteredPersons} removePerson={removePerson} />
