@@ -7,7 +7,7 @@ import Flag from './components/Flag'
 
 
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
-console.log("apiKey: ", apiKey);
+
 
 
 
