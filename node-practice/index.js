@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+const {generateId, generateBool} = require('./src/helper_functions/helpers')
+
 
 app.use(express.json());
 
@@ -55,13 +57,32 @@ app.post('/api/notes', (req, res) => {
     const values = Object.values(note);
     console.log("keys: ", keys);
     console.log("values: ", values);
-    if(keys.length !== 2) {
+    if(keys.length !== 2 || keys.length !== values.length) {
         res.status(404).end("Number of datapoints submitted is wrong");
     }
     if(keys[0] !== "content" || keys[1] !== "important") {
         console.log("wrong data");
         res.status(404).end("You're sending the wrong kind of data")
     }
+    if(req.body.content === "" || !req.body.content) {
+        res.status(404).end("content is mandatory");
+    }
+    const newId =  notes.length > 0 
+                   ? generateId(notes) 
+                   : 0;
+    const boolForNote = generateBool(note.important);
+    const content = note.content
+    const newNote = {
+        id: newId, 
+        content: content, 
+        important: boolForNote
+    }
+    notes = [...notes, newNote];
+    res.status(200).end(JSON.stringify(notes));
+
+
+
+    
     
     
     
