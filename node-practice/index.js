@@ -80,7 +80,7 @@ app.post('/api/notes', (req, res) => {
         important: boolForNote
     }
     notes = [...notes, newNote];
-    res.json(notes);
+    res.json(newNote);
 
 
 
@@ -88,6 +88,18 @@ app.post('/api/notes', (req, res) => {
     
     
     
+})
+
+app.put('/api/notes/:id' , (req, res) => {
+    const id = Number(req.params.id);
+    const foundIndex = notes.find(note => note.id === id)
+    if(foundIndex != -1) {
+        notes[foundIndex].important = !notes[foundIndex].important
+        res.status(200).json(notes);
+    }
+    else {
+        res.status(404).end("The record could not be found")
+    }
 })
 
 app.delete('/api/notes/:id', (req, res) => {
@@ -103,6 +115,6 @@ app.delete('/api/notes/:id', (req, res) => {
     
 })
 
-const PORT = 3001;
-app.listen(3001);
+const PORT = 3002;
+app.listen(3002);
 console.log(`Express app is running on port ${PORT}`);
