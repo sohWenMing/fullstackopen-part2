@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
 const {generateId, generateBool} = require('./src/helper_functions/helpers')
+const cors = require('cors');
 
 
+app.use(cors());
 app.use(express.json());
 
 let notes = [
@@ -78,7 +80,7 @@ app.post('/api/notes', (req, res) => {
         important: boolForNote
     }
     notes = [...notes, newNote];
-    res.status(200).end(JSON.stringify(notes));
+    res.json(notes);
 
 
 

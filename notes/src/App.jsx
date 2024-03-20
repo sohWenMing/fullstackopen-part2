@@ -7,16 +7,15 @@ function App() {
   const [notes, setNotes] = useState([]);
 
  function hook() {
-  noteService.getAll().then((res) => {
-    const wrongObject = {
-      id: 10000, 
-      content: "this one was not saved to the server",
-      important: true
-    }
-    const notesToUpdate = res.data.concat(wrongObject);
-    setNotes(prev => notesToUpdate);
+  console.log("now we're in the first hook")
+  noteService.getAll()
+  .then((res) => {
+    console.log(res);
   })
+ 
  }
+
+  
 
  function updateNotes(noteObject) {
   const updatedNotes = notes.map((note) => {
