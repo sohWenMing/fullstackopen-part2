@@ -3,7 +3,7 @@ import Note from './Note'
 import axios from 'axios';
 import noteService from '../services/notes'
 
-function NoteList({notes, updateNotes, setNotes}) {
+function NoteList({notes, updateNotesAfterResponse, setNotes}) {
 
     function toggleImportance(id) {
         let toggledNote = notes.find(note => note.id === id);
@@ -13,7 +13,8 @@ function NoteList({notes, updateNotes, setNotes}) {
         }
         noteService.update(toggledNote)
         .then((res) => {
-            updateNotes(res.data);  
+            console.log("res after toggle:", res);
+            updateNotesAfterResponse(res.data);  
         }).catch((error) => {
             alert(`${toggledNote.content} does not exist in the database anymore!`);
             setNotes(prev => notes.filter((note) => {

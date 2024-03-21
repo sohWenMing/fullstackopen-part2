@@ -32,7 +32,10 @@ function App() {
   })
   setNotes(prev => updatedNotes);
  }
- 
+
+ function updateNotesAfterResponse(noteArray) {
+  setNotes(prev => noteArray)
+ } 
 
  function addToNotes(noteObject) {
   setNotes(prev => [...notes, noteObject]);
@@ -50,7 +53,7 @@ function App() {
     ) : (
       <>
     <Form notes={notes} addToNotes={addToNotes}/>
-   <NoteList notes={notes} updateNotes={updateNotes} setNotes={setNotes} />
+   <NoteList notes={notes} updateNotesAfterResponse={updateNotesAfterResponse} setNotes={setNotes} />
       </>
     )
     }
