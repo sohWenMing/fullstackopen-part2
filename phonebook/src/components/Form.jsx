@@ -10,8 +10,8 @@ function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
     const [nameValid, setNameValid] = useState(true);
     const [numberValid, setNumberValid] = useState(true);
 
-    function mapPersonObject(name, number) {
-        const personObject = {name, number}
+    function mapPersonObject(name, number, id=null) {
+        const personObject = {id ,name, number}
         return(personObject);
     }
 
@@ -22,26 +22,7 @@ function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
         const form = event.target;
         const name = form.querySelector("#input_name").value;
         const number = form.querySelector("#input_number").value;
-        const filteredList = persons.filter((person) => {
-            return (
-                person.name.toLowerCase().trim() === name.toLowerCase().trim()
-            )
-        })
-        const isExist = filteredList.length > 0;
-        
-        
-        function createPerson() {
-            const newPerson = mapPersonObject(name, number);
-            services.create(newPerson)
-            .then((res) => {
-                const personObject = res.data;
-                addPerson(personObject);
-                updateMessage(
-                    `${res.data.name}'s information successfully added!`,
-                    "success"
-                )
-            })     
-        }
+        // ------------------------------form validations-----------------------------------------
         if(number === "") {
             setNumberValid(prev => false);
         }
@@ -54,11 +35,33 @@ function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
         else {
             setNameValid(prev => true);
         }
-
         if(number === "" || name==="") {
             return;
         }
+        // ------------------------------form valudations-----------------------------------------
 
+        const filteredList = persons.filter((person) => {
+            return (
+                person.name.toLowerCase().trim() === name.toLowerCase().trim()
+            )
+        })
+        const isExist = filteredList.length > 0;
+        
+        function createPerson() {
+            console.log("Create Person function ran");
+            const newPerson = mapPersonObject(name, number);
+            services.create(newPerson)
+            .then((res) => {
+                const personObject = res.data;
+                console.log(personObject)
+                addPerson(personObject);
+                updateMessage(
+                    `${res.data.name}'s information successfully added!`,
+                    "success"
+                )
+            })     
+        }
+       
         if(isExist) {
             const confirmed = confirm(`${name} already exists in the database. do you want to update the number to ${number}?`);
             if(confirmed) {

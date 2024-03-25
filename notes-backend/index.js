@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express');
 const app = express();
 const {generateId, generateBool} = require('./src/helper_functions/helpers')
-const cors = require('cors');
+const cors = require('cors')
+const Note = require('./models/note')
 
 
 app.use(cors());
@@ -9,30 +11,28 @@ app.use(express.json());
 app.use(express.static('dist'))
 //serves static files from the dist folder
 
-let notes = [
-    {
-      id: 1,
-      content: "HTML is easy",
-      important: true
-    },
-    {
-      id: 2,
-      content: "Browser can execute only JavaScript",
-      important: false
-    },
-    {
-      id: 3,
-      content: "GET and POST are the most important methods of HTTP protocol",
-      important: true
-    }
-  ]
-
-app.get('/', (req, res) => {
-    res.json(notes);
-})
+// let notes = [
+//     {
+//       id: 1,
+//       content: "HTML is easy",
+//       important: true
+//     },
+//     {
+//       id: 2,
+//       content: "Browser can execute only JavaScript",
+//       important: false
+//     },
+//     {
+//       id: 3,
+//       content: "GET and POST are the most important methods of HTTP protocol",
+//       important: true
+//     }
+//   ]
 
 app.get('/api/notes', (req, res) => {
-    res.json(notes);
+    Note.find({}).then((notes) => {
+        res.json(notes)
+    })
 })
 
 app.get('/api/notes/:id', (req, res) => {
@@ -55,41 +55,17 @@ app.get('/api/notes/:id', (req, res) => {
 })
 
 app.post('/api/notes', (req, res) => {
-    const note = req.body;
-    console.log(note, typeof note);
-    const keys = Object.keys(note);
-    const values = Object.values(note);
-    console.log("keys: ", keys);
-    console.log("values: ", values);
-    if(keys.length !== 2 || keys.length !== values.length) {
-        res.status(404).end("Number of datapoints submitted is wrong");
+    const body = req.body;
+    if (body.content === undefined) {
+        return res.status(400).json({error: "content missing"})
     }
-    if(keys[0] !== "content" || keys[1] !== "important") {
-        console.log("wrong data");
-        res.status(404).end("You're sending the wrong kind of data")
-    }
-    if(req.body.content === "" || !req.body.content) {
-        res.status(404).end("content is mandatory");
-    }
-    const newId =  notes.length > 0 
-                   ? generateId(notes) 
-                   : 0;
-    const boolForNote = generateBool(note.important);
-    const content = note.content
-    const newNote = {
-        id: newId, 
-        content: content, 
-        important: boolForNote
-    }
-    notes = [...notes, newNote];
-    res.json(newNote);
-
-
-
-    
-    
-    
-    
+    const note = new Note({
+        content: body.content, 
+        important: body.important || false
+    })
+    note.save().then((savedNote) => {
+        response.status(200).json(savedNote)
+    })
 })
 
 app.put('/api/notes/:id' , (req, res) => {
@@ -124,7 +100,7 @@ app.delete('/api/notes/:id', (req, res) => {
     
 })
 
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

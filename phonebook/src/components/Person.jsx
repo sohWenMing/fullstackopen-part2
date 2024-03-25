@@ -8,7 +8,8 @@ function Person({person, removePerson, updateMessage}) {
         if(confirmed) {
             try {
                 const response = await services.deleteFromDatabase(person.id);
-                removePerson(response.data.id);
+                console.log("Response: ", response);
+                removePerson(Number(response.data));
                 updateMessage (
                     `${person.name} was successfully removed from database`,
                     "success"

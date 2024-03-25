@@ -25,7 +25,8 @@ function App() {
   function firstRun() {
     services.getAll().then((res) => {
       const data = res.data;
-      setPersons(prev => data);
+      setPersons(prev => data.persons);
+      setFilteredPersons(prev => data.persons);
     })
   }
 
@@ -43,7 +44,9 @@ function App() {
   }
 
   function filterPersons() {
-    if(searchFilter === "") {
+    if(searchFilter === "" ) {
+      console.log("Filtered persons ran");
+      console.log("Persons: ", persons);
       return(persons)
     }
     else {
@@ -77,25 +80,25 @@ function App() {
     })
   }
 
-
-
   function removePerson(id) {
-    setPersons((prev) => {
-      console.log(`id passed into removePerson: ${id}`);
-      return (
-        persons.filter((person) => {  
-          return (
-            person.id != id
-          )
-        })
-      )
-    })
+    console.log("remov person function ran");
+    console.log(`Id passed in: ${id}, Type of id: ${typeof(id)}`)
+    const personFilter = persons.filter(person => person.id !== id);
+    const filteredFilter = filteredPersons.filter(person => person.id !== id);
+    setPersons(prev => personFilter);
+    setFilteredPersons(prev => filteredFilter);
   }
   
 
   useEffect(firstRun, []);
-  useEffect(updateFiltered,[persons]);
+  // useEffect(updateFiltered,[persons]);
   useEffect(updateFiltered, [searchFilter])
+  useEffect(() => {
+    console.log("Persons:" , persons);
+    console.log("filteredPersons: ", filteredPersons);
+
+  }, [persons, filteredPersons])
+  useEffect(updateFiltered, [persons]);
   useEffect(() => {
     if(messageType !== "") {
       setTimeout(() => {

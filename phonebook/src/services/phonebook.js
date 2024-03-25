@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = "http://localhost:3001/persons"
+const baseUrl = "/persons"
 
 function getAll() {
     return(axios.get(baseUrl));
@@ -15,9 +15,11 @@ function deleteFromDatabase(id) {
 }
 
 function update(personObject) {
+    console.log("update function ran")
     return(axios.put(`${baseUrl}/${personObject.id}`, personObject));
 }
 
 export default {getAll, create, deleteFromDatabase, update}
 
 
+ 
