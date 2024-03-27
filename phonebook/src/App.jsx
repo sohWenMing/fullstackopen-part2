@@ -25,8 +25,8 @@ function App() {
   function firstRun() {
     services.getAll().then((res) => {
       const data = res.data;
-      setPersons(prev => data.persons);
-      setFilteredPersons(prev => data.persons);
+      setPersons(prev => data);
+      setFilteredPersons(prev => data);
     })
   }
 
@@ -112,8 +112,8 @@ function App() {
       <Header text="search"/>
       {messageType !="" && <Message message={message} messageType={messageType}/>}
       <Input  id={"input_search"} onChange={updateChange} labelText={"Search"} />
-      <Form onChange={updateChange} persons={persons} addPerson={addPerson} updatePerson={updatePerson} updateMessage={updateMessage}/> 
-      <PersonList persons={filteredPersons} removePerson={removePerson} updateMessage={updateMessage}/>
+      <Form onChange={updateChange} persons={persons} addPerson={addPerson} updatePerson={updatePerson} updateMessage={updateMessage} firstRun={firstRun}/> 
+      <PersonList persons={filteredPersons} removePerson={removePerson} updateMessage={updateMessage} firstRun={firstRun}/>
     </>
     
   )

@@ -2,21 +2,45 @@ import {useState, React} from 'react';
 import Header from './Header'
 import Input from './Input';
 import services from '../services/phonebook'
+import {searchByString} from '../../helper_functions/find_filters/findFilters'
+
+function mapPersonObject(name, number, id=null) {
+    const personObject = {id ,name, number}
+    return(personObject);
+}
+
+async function createPerson(name, number) {
+    // console.log("Create Person function ran");
+    const newPerson = mapPersonObject(name, number);
+    try {
+        const response = await services.create(newPerson)
+        return response;
+    }
+    catch(error) {
+        throw error
+    }
+}
+
+async function updatePerson(personObject) {
+    try {
+        const response = await services.update(personObject);
+        return response
+    }
+    catch(error) {
+        throw error
+    }
+}
 
 
-function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
+
+
+function Form({onChange, persons, addPerson, updatePerson, updateMessage, firstRun}) {
     
 
     const [nameValid, setNameValid] = useState(true);
     const [numberValid, setNumberValid] = useState(true);
 
-    function mapPersonObject(name, number, id=null) {
-        const personObject = {id ,name, number}
-        return(personObject);
-    }
-
-
-    function onSubmit(event) {
+    async function onSubmit(event) {
         event.preventDefault();
         console.log("button pressed");
         const form = event.target;
@@ -38,71 +62,44 @@ function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
         if(number === "" || name==="") {
             return;
         }
-        // ------------------------------form valudations-----------------------------------------
+        // ------------------------------form validations-----------------------------------------
 
-        const filteredList = persons.filter((person) => {
-            return (
-                person.name.toLowerCase().trim() === name.toLowerCase().trim()
-            )
-        })
-        const isExist = filteredList.length > 0;
+        const filteredPerson = searchByString(persons, ['name'], name);
+        const isExist = filteredPerson.isFound
         
-        function createPerson() {
-            console.log("Create Person function ran");
-            const newPerson = mapPersonObject(name, number);
-            services.create(newPerson)
-            .then((res) => {
-                const personObject = res.data;
-                console.log(personObject)
-                addPerson(personObject);
-                updateMessage(
-                    `${res.data.name}'s information successfully added!`,
-                    "success"
-                )
-            })     
-        }
-       
         if(isExist) {
+            console.log("Person record found: ", filteredPerson.record);
+            
             const confirmed = confirm(`${name} already exists in the database. do you want to update the number to ${number}?`);
-            if(confirmed) {
-                const personToUpdate = filteredList[0];
-                console.log("personToUpdate :", personToUpdate)
-                const updatedPerson = {
-                    ...personToUpdate, 
-                    number: number
-                }
-                console.log("new person object: ", updatedPerson);
-                const personsWithUpdatedRemoved = persons.filter(person => person.id !== updatedPerson.id)
-
-                services.update(updatedPerson)
-                .then((res) => {
-                    const returnedPerson = res.data;
-                    const updatedList = [...personsWithUpdatedRemoved, returnedPerson];
-                    updatePerson(updatedList);
-                    updateMessage(
-                        `${res.data.name}'s information successfully updated!`,
-                        "success"
-                    )
-                })
-                .catch((error) => {
-                    const updatedList = [...personsWithUpdatedRemoved];
-                    updatePerson(updatedList);
-                    updateMessage(
-                        `${updatedPerson.name} was already removed from database`,
-                        "fail"
-                    )
-                    
-                    
-                })
+           if(confirmed) {
+            filteredPerson.name = name;
+            filteredPerson.number = number;
+            console.log("id: ", filteredPerson.record.id)
+            const mappedPerson = mapPersonObject(filteredPerson.name, filteredPerson.number, filteredPerson.record.id);
+           try {
+                const response = await services.update(mappedPerson)
+                console.log("response: ", response);
+                updatePerson(response.data.allPersons);
+                updateMessage(`${response.data.updatedPerson.name}'s record was successfully updated`, "success")
+           }
+           catch(error) {
+            updateMessage("There was a problem with the operation", "failure")
+            firstRun();
+           }
+            
+        }
+    }
+        else {
+            try {
+                const response = await createPerson(name, number);
+                updatePerson(response.data.allPersons);
+                updateMessage(`${name} was successfully added to the database`, "success")
+            }
+            catch(error) {
+                updateMessage("There was a problem with the operation", "failure")
             }
            
-        }
-        else {
-            createPerson();
-        }
-        
-       
-        
+        }  
     }
 
 
@@ -115,7 +112,6 @@ function Form({onChange, persons, addPerson, updatePerson, updateMessage}) {
         <button>Submit</button>
         </form>
         </>
-
     )
 }
 
